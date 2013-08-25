@@ -47,7 +47,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	struct sockaddr_in endpoint_remote;
 	int sinlen = sizeof(endpoint_remote);
 
-	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sfd == -1)
 		debug_print(LEVEL_FATAL_ERROR, "Error while 'socket'!");
@@ -94,7 +94,7 @@ void *InitializeHostConnection(void *InitializeHostConnection) {
 	int sfd, err, keepaliveid, sinlen = sizeof(struct sockaddr_in);
 	char buffer[NETWORK_BUFFER_MAX_LENGTH];
 
-	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sfd == -1)
 		debug_print(LEVEL_FATAL_ERROR, "Error while 'socket'!");
