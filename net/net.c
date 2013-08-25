@@ -55,7 +55,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 
 	memset(&endpoint_local, 0, sizeof(struct sockaddr_in));
 	endpoint_local.sin_family = AF_INET;
-	endpoint_local.sin_port = UPDPORT;
+	endpoint_local.sin_port = UDPPORT;
 	endpoint_local.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	err = bind(sfd, (struct sockaddr *) &endpoint_local, sizeof(endpoint_local));
@@ -71,7 +71,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 
 	err = 0;
 	while (1) {
-
+		debug_print(LEVEL_DEBUG, "Waiting for Incomming Packet");
 		err = recvfrom(sfd, &netbuffer, NETWORK_BUFFER_SIZE, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
 		if (err == -1)
 			debug_print(LEVEL_ERROR, "Error while 'recvfrom'");
@@ -87,9 +87,40 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 }
 
 void *InitializeHostConnection(void *InitializeHostConnection) {
+	// Send Ping Packets every time to keep connection up2date
 
+	struct sockaddr_in endpoint_remote;
+	int sfd, err, keepaliveid, sinlen = sizeof(struct sockaddr_in);
+	char buffer[NETWORK_BUFFER_MAX_LENGTH];
 
+	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
+	if (sfd == -1)
+		debug_print(LEVEL_FATAL_ERROR, "Error while 'socket'!");
+	else
+		debug_print(LEVEL_VERBOSE, "Socket succesful opened!");
+
+	memset(&endpoint_remote, 0, sizeof(struct sockaddr_in));
+	endpoint_remote.sin_family = AF_INET;
+	endpoint_remote.sin_port = htons(UDPPORT);
+	
+	err = inet_aton(REMOTE_HOST, &endpoint_remote.sin_addr);
+
+	if (err == 0)
+		debug_print(LEVEL_FATAL_ERROR, "inet_aton failed");
+
+	keepaliveid = 0;
+
+	while (1) {
+		sprintf(buffer, "Hello World! KAID: %d", keepaliveid++);
+		err = sendto(sfd, buffer, strlen(buffer), 0, (struct sockaddr *)&endpoint_remote, sinlen);
+		if (err == -1)
+			debug_print(LEVEL_ERROR, "Error while 'sendto'");
+		else
+			debug_print(LEVEL_DEBUG, "Sent Packet");
+			
+		sleep(1);
+	}
 
 	return NULL;
 }
