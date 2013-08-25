@@ -42,9 +42,10 @@ void HandleMessage(char *buffer, struct sockaddr_in *endpoint_remote) {
 
 void *InitializeSocket(void * InitializeSocketArgs) {
 	struct sockaddr_in endpoint_local;
-	int sfd, err, sinlen = sizeof(struct sockaddr_in);
+	int sfd, err;
 	char netbuffer[NETWORK_BUFFER_SIZE];
 	struct sockaddr_in endpoint_remote;
+	int sinlen = sizeof(endpoint_remote);
 
 	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
@@ -72,7 +73,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	err = 0;
 	while (1) {
 		debug_print(LEVEL_DEBUG, "Waiting for Incomming Packet");
-		err = recvfrom(sfd, &netbuffer, NETWORK_BUFFER_SIZE, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
+		err = recvfrom(sfd, &netbuffer, 100, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
 		if (err == -1)
 			debug_print(LEVEL_ERROR, "Error while 'recvfrom'");
 		else
