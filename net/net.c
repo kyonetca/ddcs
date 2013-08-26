@@ -37,7 +37,7 @@
 int SocketReady;
 
 void HandleMessage(char *buffer, int length, struct sockaddr_in *endpoint_remote) {
-	debug_print(LEVEL_DEVELOPMENT, "buffer");
+	debug_print(LEVEL_DEVELOPMENT, buffer);
 }
 
 void *InitializeSocket(void * InitializeSocketArgs) {
@@ -77,7 +77,9 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	err = 0;
 	while (1) {
 		debug_print(LEVEL_DEBUG, "Waiting for Incomming Packet");
-		length = recvfrom(sfd, &netbuffer, 100, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
+		memset(&netbuffer, 0, NETWORK_BUFFER_SIZE);
+
+		length = recvfrom(sfd, &netbuffer, NETWORK_BUFFER_SIZE - 1, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
 		if (length == -1)
 			debug_print(LEVEL_ERROR, "Error while 'recvfrom'");
 		else
