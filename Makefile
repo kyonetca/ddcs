@@ -1,7 +1,7 @@
 CC=gcc
 
 CFLAGS=-c -Wall
-LDFLAGS=
+LDFLAGS=-pthread
 
 SOURCES=ddcs.c net/net.c tools.c
 OBJECTS=$(SOURCES:.c=.o)
