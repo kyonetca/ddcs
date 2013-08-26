@@ -50,7 +50,8 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 #else
 	unsigned int sinlen = sizeof(struct sockaddr);
 #endif
-	sfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (sfd == -1)
 		debug_print(LEVEL_FATAL_ERROR, "Error while 'socket'!");
@@ -59,11 +60,11 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 
 	memset(&endpoint_local, 0, sizeof(struct sockaddr_in));
 	endpoint_local.sin_family = AF_INET;
-	endpoint_local.sin_port = UDPPORT;
+	endpoint_local.sin_port = htons(UDPPORT);
 	endpoint_local.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	err = bind(sfd, (struct sockaddr *) &endpoint_local, sizeof(struct sockaddr_in));
-
+	
 	if (err == -1)
 		debug_print(LEVEL_FATAL_ERROR, "Error while 'bind'");
 	else
@@ -84,7 +85,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 
 		HandleMessage(netbuffer, length, &endpoint_remote);
 	}
-
+	
 	close(sfd);
 
 	return NULL;
