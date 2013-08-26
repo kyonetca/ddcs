@@ -45,7 +45,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	int sfd, err;
 	char netbuffer[NETWORK_BUFFER_SIZE];
 	struct sockaddr_in endpoint_remote;
-	int sinlen = sizeof(endpoint_remote);
+	int sinlen = sizeof(struct sockaddr);
 
 	sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -59,7 +59,7 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	endpoint_local.sin_port = UDPPORT;
 	endpoint_local.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	err = bind(sfd, (struct sockaddr *) &endpoint_local, sizeof(endpoint_local));
+	err = bind(sfd, (struct sockaddr *) &endpoint_local, sizeof(struct sockaddr_in));
 
 	if (err == -1)
 		debug_print(LEVEL_FATAL_ERROR, "Error while 'bind'");
