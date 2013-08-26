@@ -36,17 +36,20 @@
 
 int SocketReady;
 
-void HandleMessage(char *buffer, struct sockaddr_in *endpoint_remote) {
+void HandleMessage(char *buffer, int length, struct sockaddr_in *endpoint_remote) {
 	debug_print(LEVEL_DEVELOPMENT, "buffer");
 }
 
 void *InitializeSocket(void * InitializeSocketArgs) {
 	struct sockaddr_in endpoint_local;
-	int sfd, err;
+	int sfd, err, length;
 	char netbuffer[NETWORK_BUFFER_SIZE];
 	struct sockaddr_in endpoint_remote;
+#if defined __CYGWIN__	
 	int sinlen = sizeof(struct sockaddr);
-
+#else
+	unsigned int sinlen = sizeof(struct sockaddr);
+#endif
 	sfd = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sfd == -1)
@@ -73,13 +76,13 @@ void *InitializeSocket(void * InitializeSocketArgs) {
 	err = 0;
 	while (1) {
 		debug_print(LEVEL_DEBUG, "Waiting for Incomming Packet");
-		err = recvfrom(sfd, &netbuffer, 100, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
-		if (err == -1)
+		length = recvfrom(sfd, &netbuffer, 100, 0, (struct sockaddr *)&endpoint_remote, &sinlen);
+		if (length == -1)
 			debug_print(LEVEL_ERROR, "Error while 'recvfrom'");
 		else
 			debug_print(LEVEL_DEBUG, "Recieved Packet");
 
-		HandleMessage(netbuffer, &endpoint_remote);
+		HandleMessage(netbuffer, length, &endpoint_remote);
 	}
 
 	close(sfd);
